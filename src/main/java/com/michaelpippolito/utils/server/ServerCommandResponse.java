@@ -1,9 +1,11 @@
 package com.michaelpippolito.utils.server;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class ServerCommandResponse {
+@AllArgsConstructor
+public class ServerCommandResponse {
     @Getter @Setter
     private ServerCommandStatus commandStatus;
 

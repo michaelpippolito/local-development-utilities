@@ -1,5 +1,5 @@
 package com.michaelpippolito.utils.server;
 
 public enum ServerCommandStatus {
-    SUCCESS, FAILED, PORT_ALREADY_IN_USE
+    SUCCESS, FAILED, INTERNAL_ERROR, PORT_ALREADY_IN_USE
 }

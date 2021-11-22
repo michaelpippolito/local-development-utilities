@@ -1,8 +1,9 @@
 package com.michaelpippolito.utils.sftp;
 
+import com.michaelpippolito.utils.server.ServerCommandResponse;
 import com.michaelpippolito.utils.server.ServerCommandStatus;
 import com.michaelpippolito.utils.sftp.request.StartSftpServerRequest;
-import com.michaelpippolito.utils.sftp.response.StartSftpServerResponse;
+import com.michaelpippolito.utils.sftp.request.StopSftpServerRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,16 +19,26 @@ public class SftpController {
     private SftpHelper sftpHelper;
 
     @PostMapping("/sftp/start/{port}")
-    public ResponseEntity<StartSftpServerResponse> startSftpServer(@PathVariable int port) {
-        return startSftpServer(sftpHelper.startSftpServer(port));
+    public ResponseEntity<ServerCommandResponse> sftpResponse(@PathVariable int port) {
+        return sftpResponse(sftpHelper.startSftpServer(port));
     }
 
     @PostMapping("/sftp/start")
-    public ResponseEntity<StartSftpServerResponse> startSftpServer(@RequestBody StartSftpServerRequest request) {
-        return startSftpServer(sftpHelper.startSftpServer(request));
+    public ResponseEntity<ServerCommandResponse> sftpResponse(@RequestBody StartSftpServerRequest request) {
+        return sftpResponse(sftpHelper.startSftpServer(request));
     }
 
-    private ResponseEntity<StartSftpServerResponse> startSftpServer(StartSftpServerResponse response) {
+    @PostMapping("/sftp/stop/{port}")
+    public ResponseEntity<ServerCommandResponse> stopSftpServer(@PathVariable int port) {
+        return sftpResponse(sftpHelper.stopSftpServer(port));
+    }
+
+    @PostMapping("/sftp/stop")
+    public ResponseEntity<ServerCommandResponse> stopSftpServer(@RequestBody StopSftpServerRequest request) {
+        return sftpResponse(sftpHelper.stopSftpServer(request));
+    }
+
+    private ResponseEntity<ServerCommandResponse> sftpResponse(ServerCommandResponse response) {
         if (response.getCommandStatus().equals(ServerCommandStatus.SUCCESS)) {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {

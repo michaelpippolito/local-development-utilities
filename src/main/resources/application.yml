@@ -3,4 +3,10 @@ server:
 
 logging:
   level:
-    org.appache.sshd: FATAL
+    org.apache.sshd: FATAL
+
+sftp:
+  autoStartup: false
+  localDir: D:\Code\local_sftp_server
+  defaultServers:
+    0000:
