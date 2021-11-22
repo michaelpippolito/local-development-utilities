@@ -49,8 +49,6 @@ public class SftpTests {
     @Autowired
     private SftpConfig sftpConfig;
 
-    private final String testFileName = "test_file.txt";
-
     @After
     public void cleanupTests() throws IOException {
         sftpHelper.stopAllSftpServers();
@@ -250,6 +248,7 @@ public class SftpTests {
             Verify file write, read, & delete
          */
         try {
+            String testFileName = "test_file.txt";
             String testFilePath = this.getClass().getResource(testFileName).toURI().getPath();
             String testFileContents = readFromInputStream(this.getClass().getResourceAsStream(testFileName));
 

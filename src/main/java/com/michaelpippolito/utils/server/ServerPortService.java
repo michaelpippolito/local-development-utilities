@@ -14,7 +14,7 @@ public class ServerPortService {
     private ServerManager serverManager;
 
     @EventListener
-    public void onApplicationEven(final ServletWebServerInitializedEvent event) {
+    public void onApplicationEvent(final ServletWebServerInitializedEvent event) {
         serverManager.occupyPort(event.getWebServer().getPort(), ServerType.APPLICATION);
     }
 }
