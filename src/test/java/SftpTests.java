@@ -7,6 +7,7 @@ import com.michaelpippolito.utils.server.ServerType;
 import com.michaelpippolito.utils.sftp.SftpConfig;
 import com.michaelpippolito.utils.sftp.SftpHelper;
 import com.michaelpippolito.utils.sftp.request.StartSftpServerRequest;
+import com.michaelpippolito.utils.sftp.request.StopSftpServerRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -171,7 +172,7 @@ public class SftpTests {
         int case4Port = case1Port;
         ServerCommandResponse case4Response = restTemplate.postForObject(url + "/" + case4Port, null, ServerCommandResponse.class);
         verifyServerCommandResponse(
-                restTemplate.postForObject(url + "/" + case4Port, null, ServerCommandResponse.class),
+                restTemplate.postForObject(url, new StartSftpServerRequest(case4Port, Collections.emptyList()), ServerCommandResponse.class),
                 ServerCommandStatus.SUCCESS,
                 ServerStatus.UP,
                 ServerType.SFTP
@@ -184,11 +185,101 @@ public class SftpTests {
         log.info("Case 5: Verify when a port occupied by something other than an SFTP Server is sent that a failure response is received indicating the port's current use");
         int case5Port = port;
         verifyServerCommandResponse(
-                restTemplate.postForObject(url + "/" + case5Port, null, ServerCommandResponse.class),
+                restTemplate.postForObject(url, new StartSftpServerRequest(case5Port, Collections.emptyList()), ServerCommandResponse.class),
                 ServerCommandStatus.PORT_ALREADY_IN_USE,
                 ServerStatus.UP,
                 ServerType.APPLICATION
         );
+    }
+
+    @Test
+    public void stopServerUrlParamTests() {
+        String startUrl = "http://localhost:" + port + "/sftp/start";
+        String stopUrl = "http://localhost:" + port + "/sftp/stop";
+
+        /*
+            Case 1: Verify when no servers are running and a valid port is sent that successful response is received
+         */
+        log.info("Case 1: Verify when no servers are running and a valid port is sent that successful response is received");
+        int case1Port = SocketUtils.findAvailableTcpPort();
+        verifyServerCommandResponse(
+                restTemplate.postForObject(stopUrl + "/" + case1Port, null, ServerCommandResponse.class),
+                ServerCommandStatus.SUCCESS,
+                ServerStatus.DOWN,
+                ServerType.SFTP
+        );
+
+        /*
+            Case 2: Verify when a servers are running and its port is sent that a successful response is received
+         */
+        log.info("Case 2: Verify when a server is running and its port is sent that a successful response is received");
+        int case2Port = SocketUtils.findAvailableTcpPort();
+        restTemplate.postForObject(startUrl + "/" + case2Port, null, ServerCommandResponse.class);
+        verifyServerCommandResponse(
+                restTemplate.postForObject(stopUrl + "/" + case2Port, null, ServerCommandResponse.class),
+                ServerCommandStatus.SUCCESS,
+                ServerStatus.DOWN,
+                ServerType.SFTP
+        );
+
+        /*
+            Case 3: Verify when a port occupied by something other than an SFTP Server is sent that a failure response
+            is received indicating the port's current use
+         */
+        log.info("Case 3: Verify when a port occupied by something other than an SFTP Server is sent that a failure response is received indicating the port's current use");
+        int case3Port = port;
+        verifyServerCommandResponse(
+                restTemplate.postForObject(stopUrl + "/" + case3Port, null, ServerCommandResponse.class),
+                ServerCommandStatus.FAILED,
+                ServerStatus.UP,
+                ServerType.APPLICATION
+        );
+
+    }
+
+    @Test
+    public void stopServerRequestBodyTests() {
+        String startUrl = "http://localhost:" + port + "/sftp/start";
+        String stopUrl = "http://localhost:" + port + "/sftp/stop";
+
+        /*
+            Case 1: Verify when no servers are running and a valid port is sent that successful response is received
+         */
+        log.info("Case 1: Verify when no servers are running and a valid port is sent that successful response is received");
+        int case1Port = SocketUtils.findAvailableTcpPort();
+        verifyServerCommandResponse(
+                restTemplate.postForObject(stopUrl, new StopSftpServerRequest(case1Port), ServerCommandResponse.class),
+                ServerCommandStatus.SUCCESS,
+                ServerStatus.DOWN,
+                ServerType.SFTP
+        );
+
+        /*
+            Case 2: Verify when a servers are running and its port is sent that a successful response is received
+         */
+        log.info("Case 2: Verify when a server is running and its port is sent that a successful response is received");
+        int case2Port = SocketUtils.findAvailableTcpPort();
+        restTemplate.postForObject(startUrl, new StartSftpServerRequest(case2Port, Collections.emptyList()), ServerCommandResponse.class);
+        verifyServerCommandResponse(
+                restTemplate.postForObject(stopUrl, new StopSftpServerRequest(case2Port), ServerCommandResponse.class),
+                ServerCommandStatus.SUCCESS,
+                ServerStatus.DOWN,
+                ServerType.SFTP
+        );
+
+        /*
+            Case 3: Verify when a port occupied by something other than an SFTP Server is sent that a failure response
+            is received indicating the port's current use
+         */
+        log.info("Case 3: Verify when a port occupied by something other than an SFTP Server is sent that a failure response is received indicating the port's current use");
+        int case3Port = port;
+        verifyServerCommandResponse(
+                restTemplate.postForObject(stopUrl, new StopSftpServerRequest(case3Port), ServerCommandResponse.class),
+                ServerCommandStatus.FAILED,
+                ServerStatus.UP,
+                ServerType.APPLICATION
+        );
+
     }
 
     private void verifyServerCommandResponse(

@@ -8,4 +8,7 @@ import lombok.Setter;
 public class StopSftpServerRequest {
     @Getter @Setter
     private int port;
+
+    public StopSftpServerRequest() {
+    }
 }

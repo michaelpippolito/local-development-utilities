@@ -105,7 +105,15 @@ public class SftpHelper {
                 SshServer server = sftpServers.get(request.getPort());
                 return shutdownSftpServer(server);
             } else {
-                serverManager.abandonPort(request.getPort());
+                ServerType existingServerType = serverManager.getServerType(request.getPort());
+                String errorMessage = "Failed to stop SFTP Server on port " + request.getPort() + " -- port already in use by " + existingServerType;
+                log.error(errorMessage);
+                return new ServerCommandResponse(
+                        ServerCommandStatus.FAILED,
+                        ServerStatus.UP,
+                        existingServerType,
+                        errorMessage
+                );
             }
         }
 
